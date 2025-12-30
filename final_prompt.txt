@@ -1,0 +1,171 @@
+# Role & Objective
+
+You are a software engineer tasked with fixing a critical regression bug in a scientific calculator application. Your goal is to identify and fix the bug introduced in version 1.1 that broke negative number handling, then create a corrected version and execute comprehensive validation.
+
+## Background
+
+A scientific calculator has been in stable production for 8 months (v1.0). Recently, a new feature was added to support angle mode for trigonometric functions (v1.1). While the new feature works correctly, it has inadvertently broken the handling of negative numbers in mathematical expressions.
+
+**What's Broken:**
+- All mathematical expressions containing negative numbers fail when angle mode is enabled
+- Examples of failing expressions:
+  - `-5 + 3` (should return -2.0)
+  - `2 * (-3)` (should return -6.0)
+  - `10 - -5` (should return 15.0)
+
+**What Still Works:**
+- All positive number calculations work fine
+- The new angle mode feature itself works correctly (e.g., `sin(30)` in degrees)
+- When angle mode is disabled (v1.0 behavior), everything works perfectly
+
+## Inputs & Context
+
+**Target Workspace:** Create relevant project files under the designated workspace directory.
+
+**Original Project Structure:**
+```
+issue_project/
+├── src/
+│   ├── __init__.py
+│   ├── calculator.py
+│   └── tokenizer.py
+├── tests/
+│   ├── __init__.py
+│   ├── test_calculator.py
+│   └── test_regression.py
+├── README.md
+└── requirements.txt
+```
+
+**Problem:** The v1.1 tokenizer regex pattern was modified to support angle mode but inadvertently removed the optional leading `-` for numeric literals, causing negative numbers to be incorrectly tokenized.
+
+## Step-by-Step Instructions
+
+### Step 1: Investigate the Bug
+1. Run the regression tests to identify failing cases: `pytest tests/test_regression.py -v`
+2. Examine the tokenizer.py file to understand how expressions are tokenized
+3. Compare the v1.0 and v1.1 regex patterns for numeric literals
+4. Identify why negative numbers are not being recognized as single tokens
+5. Trace through the calculator code to understand the impact
+
+### Step 2: Identify the Root Cause
+1. Analyze how the tokenizer patterns differ between versions
+2. Locate the exact regex pattern that was changed
+3. Understand what the v1.1 pattern is missing
+4. Determine what change will fix negative number handling without breaking angle mode
+
+### Step 3: Create Fixed Version
+Create a new directory `issue_project_fixed/` under the designated workspace with the corrected code:
+
+```
+issue_project_fixed/
+├── src/
+│   ├── __init__.py
+│   ├── calculator.py
+│   └── tokenizer.py      # FIXED VERSION
+├── tests/
+│   ├── __init__.py
+│   ├── test_calculator.py
+│   └── test_regression.py
+├── README.md
+├── FIXES.md              # Document your changes
+└── requirements.txt
+```
+
+### Step 4: Implement the Fix
+1. Copy all source files from the original project to the fixed directory
+2. Modify the tokenizer regex pattern to restore negative number support
+3. Update the number pattern to include optional leading minus: `r'(-?\d+\.?\d*)|...'`
+4. Ensure the fix works for both angle mode ON and OFF
+5. Verify that all other functionality remains intact
+
+### Step 5: Execute Full Project Validation
+
+**5.1 Environment Setup:**
+- Install dependencies: `pip install -r requirements.txt`
+- Verify all required packages are available
+- Activate Python environment if needed
+
+**5.2 System Launch Verification:**
+- Run the calculator demo: `python src/calculator.py`
+- Verify the application launches successfully without errors
+- Confirm that calculations work correctly in both modes:
+  - Radian mode (angle mode disabled)
+  - Angle mode (with the fix applied)
+
+**5.3 Automated Test Suite Execution:**
+- Run all tests with verbose output: `pytest tests/ -v`
+- Verify all 12+ tests pass
+- Ensure both regression tests and existing tests pass
+- Capture complete test output
+
+**5.4 Verification of Key Functionality:**
+- Test negative number expressions: `-5 + 3`, `2 * (-3)`, `10 - -5`
+- Test angle mode calculations: `sin(30)`, `cos(45)` in degrees
+- Test positive number expressions to ensure no regressions
+- Verify that both radian and angle modes produce correct results
+
+**5.5 Comprehensive Reporting:**
+- Confirm the system launches successfully without import/runtime errors
+- Verify all business rule enforcement through test execution
+- Ensure no errors, warnings, or exceptions occur during any phase
+- Capture all outputs, logs, and any error traces if failures occur
+- Summarize runtime results and explicitly state whether all test cases passed
+
+## Output Specification
+
+### Deliverable 1: Fixed Project Directory
+Create `issue_project_fixed/` with:
+- All necessary source files with the tokenizer fix applied
+- Complete test suite (unchanged from original)
+- Updated README.md indicating this is the fixed version with all tests passing
+- New FIXES.md explaining the bug, root cause, and solution applied
+- All supporting files properly structured and functional
+
+### Deliverable 2: FIXES.md
+Document your fix with these sections:
+- **Description of what you found:** Explain the regression and failing test cases
+- **What you changed and why:** Describe the regex pattern modification and the rationale
+- **How you verified the fix:** Confirm all tests pass and functionality is restored
+
+### Deliverable 3: Updated README.md
+Update the README to:
+- Indicate this is the corrected version
+- Document that the negative number bug has been fixed
+- Confirm that all tests pass
+
+### Deliverable 4: Validation Evidence
+Provide explicit confirmation that:
+- System launches successfully without errors
+- Demo application runs correctly in both modes
+- All automated test cases pass (12+ tests)
+- Negative number expressions are handled correctly
+- Angle mode feature continues to work correctly
+- No regressions in existing functionality
+- Runtime results explicitly state whether all test cases passed
+
+## Constraints & Preferences
+
+- **Do NOT modify the original project** in `issue_project/`
+- **Create all files in the new directory** `issue_project_fixed/`
+- **Preserve all working functionality** — do not break what currently works
+- **Maintain the angle mode feature** — it should continue to work
+- **Fix must work on both modes** — angle mode ON and OFF
+- **Minimal changes** — fix only the tokenizer regex pattern as necessary
+- **Code quality** — ensure the fix is clean and clearly addresses the root cause
+
+## Quality Gates
+
+All of the following must be confirmed and explicitly stated:
+1. ✅ All test cases pass (12+ tests, 0 failures)
+2. ✅ Negative number expressions now work correctly (e.g., `-5 + 3 = -2.0`)
+3. ✅ Parenthesized negative numbers work (e.g., `2 * (-3) = -6.0`)
+4. ✅ Double negatives work (e.g., `10 - -5 = 15.0`)
+5. ✅ Angle mode feature still works correctly (e.g., `sin(30)` in degrees)
+6. ✅ Radian mode (v1.0 behavior) still works correctly
+7. ✅ System launches successfully without errors
+8. ✅ Demo application runs and shows correct output
+9. ✅ FIXES.md clearly explains the issue and solution
+10. ✅ Project structure matches the specified layout exactly
+11. ✅ No errors, warnings, or exceptions during installation, launch, or test execution
+12. ✅ Explicit confirmation that all test cases passed with quantified results
